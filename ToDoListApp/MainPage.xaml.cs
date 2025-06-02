@@ -24,6 +24,7 @@ public partial class MainPage : ContentPage
             if (list != null)
                 Tasks = new ObservableCollection<ToDoItem>(list);
         }
+
         TaskListView.ItemsSource = Tasks;
     }
 
@@ -43,13 +44,28 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void DeleteTask(object sender, EventArgs e)
+    private void DeleteTask_Clicked(object sender, EventArgs e)
     {
-        var menuItem = sender as MenuItem;
-        if (menuItem?.CommandParameter is ToDoItem task)
+        if (sender is Button button && button.CommandParameter is ToDoItem task)
         {
             Tasks.Remove(task);
             SaveTasks();
+        }
+    }
+
+    private async void EditTask_Clicked(object sender, EventArgs e)
+    {
+        if (sender is Button button && button.CommandParameter is ToDoItem task)
+        {
+            string result = await DisplayPromptAsync("Edytuj zadanie", "Nowy tekst:", initialValue: task.Text);
+
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                task.Text = result;
+                TaskListView.ItemsSource = null;
+                TaskListView.ItemsSource = Tasks;
+                SaveTasks();
+            }
         }
     }
 
